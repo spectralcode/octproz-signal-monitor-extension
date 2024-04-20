@@ -136,7 +136,7 @@ void ImageDisplay::receiveFrame(void *frame, unsigned int bitDepth, unsigned int
 
 void ImageDisplay::displayFrame(uchar* frame, unsigned int samplesPerLine, unsigned int linesPerFrame) {
 	//create QPixmap from uchar array and update inputItem
-	QImage image(frame, samplesPerLine, linesPerFrame, QImage::Format_Grayscale8 );
+	QImage image(frame, samplesPerLine, linesPerFrame, samplesPerLine, QImage::Format_Grayscale8 );
 	this->inputItem->setPixmap(QPixmap::fromImage(image));
 
 	//scale view if input sizes have changed
