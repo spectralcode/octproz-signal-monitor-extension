@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>562</height>
+    <height>662</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -191,7 +191,7 @@ p, li { white-space: pre-wrap; }
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>240</height>
+       <height>340</height>
       </size>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -291,7 +291,7 @@ p, li { white-space: pre-wrap; }
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>100</height>
+          <height>200</height>
          </size>
         </property>
         <property name="baseSize">
@@ -368,15 +368,15 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ImageDisplay</class>
-   <extends>QWidget</extends>
-   <header>imagedisplay.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ScrollingPlot</class>
    <extends>QWidget</extends>
    <header>scrollingplot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ImageDisplay</class>
+   <extends>QWidget</extends>
+   <header>imagedisplay.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

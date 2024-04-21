@@ -140,7 +140,7 @@ void SignalMonitorForm::toggleSettingsArea() {
 	const int animationDuration = 300; //in milliseconds
 	const int deltaHeight = settingsArea->minimumHeight();
 	const int minHeightWhenHidden = 220;
-	const int minHeightWhenShown = minHeightWhenHidden + 230;
+	const int minHeightWhenShown = minHeightWhenHidden + 330;
 
 	// Prepare window height change animation
 	QPropertyAnimation* windowHeightAnimation = new QPropertyAnimation(this, "geometry");
