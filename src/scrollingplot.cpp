@@ -1,7 +1,7 @@
 #include "scrollingplot.h"
 #include <QPainterPathStroker>
 
-ScrollingPlot::ScrollingPlot(QWidget *parent) : QCustomPlot(parent){
+ScrollingPlot::ScrollingPlot(QWidget* parent) : QCustomPlot(parent){
 	//default colors
 	this->referenceCurveAlpha = 255;
 	this->setBackground( QColor(50, 50, 50));
@@ -166,7 +166,7 @@ void ScrollingPlot::zoomOutSlightly() {
 	this->xAxis->scaleRange(1.1, this->xAxis->range().center());
 }
 
-void ScrollingPlot::contextMenuEvent(QContextMenuEvent *event) {
+void ScrollingPlot::contextMenuEvent(QContextMenuEvent* event) {
 	QMenu menu(this);
 	QAction savePlotAction(tr("Save Plot as..."), this);
 	connect(&savePlotAction, &QAction::triggered, this, &ScrollingPlot::saveToDisk);
@@ -177,7 +177,7 @@ void ScrollingPlot::contextMenuEvent(QContextMenuEvent *event) {
 	menu.exec(event->globalPos());
 }
 
-void ScrollingPlot::mouseMoveEvent(QMouseEvent *event) {
+void ScrollingPlot::mouseMoveEvent(QMouseEvent* event) {
 	if(!(event->buttons() & Qt::LeftButton)){
 		double x = this->xAxis->pixelToCoord(event->pos().x());
 		double y = this->yAxis->pixelToCoord(event->pos().y());
@@ -187,8 +187,8 @@ void ScrollingPlot::mouseMoveEvent(QMouseEvent *event) {
 	}
 }
 
-void ScrollingPlot::changeEvent(QEvent *event) {
-	if(event->ActivationChange){
+void ScrollingPlot::changeEvent(QEvent* event) {
+	if(event->type() == QEvent::ActivationChange){
 		if(!this->isEnabled()){
 			this->curveColor.setAlpha(55);
 			this->referenceCurveColor.setAlpha(25);
