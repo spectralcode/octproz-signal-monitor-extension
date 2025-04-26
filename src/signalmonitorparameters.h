@@ -16,6 +16,7 @@
 #define SIGNALMONITOR_ROI_Y "roi_y"
 #define SIGNALMONITOR_ROI_WIDTH "roi_width"
 #define SIGNALMONITOR_ROI_HEIGHT "roi_height"
+#define SIGNALMONITOR_WINDOW_STATE "window_state"
 
 enum BUFFER_SOURCE{
 	RAW,
@@ -37,10 +38,9 @@ struct SignalMonitorParameters {
 	int bufferNr;
 	int nthBufferToUse;
 	int visibleSamples;
+	QByteArray windowState;
 };
 Q_DECLARE_METATYPE(SignalMonitorParameters)
 
 
 #endif //SIGNALMONITORPARAMETERS_H
-
-

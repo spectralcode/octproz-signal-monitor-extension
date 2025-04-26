@@ -72,13 +72,15 @@ SignalMonitorForm::SignalMonitorForm(QWidget *parent) :
 	//Frame slider and spinBox
 	connect(this->ui->horizontalSlider_frame, &QSlider::valueChanged, this->ui->spinBox_frame, &QSpinBox::setValue);
 	connect(this->ui->spinBox_frame, QOverload<int>::of(&QSpinBox::valueChanged), this->ui->horizontalSlider_frame, &QSlider::setValue);
-	connect(this->ui->horizontalSlider_frame, &QSlider::valueChanged, [this](int frameNr) { // Der `int`-Parameter wird hier ignoriert
+	connect(this->ui->horizontalSlider_frame, &QSlider::valueChanged, this, [this](int frameNr) {
 		this->parameters.frameNr = frameNr;
 		emit frameNrChanged(frameNr);
 		emit paramsChanged();
 	});
-	this->setMaximumFrameNr(512);	
+	this->setMaximumFrameNr(512);
 
+	//window size and position changes are intercepted by event filter
+	this->installEventFilter(this);
 
 	//default values
 	this->parameters.bufferNr= -1;
@@ -107,6 +109,7 @@ void SignalMonitorForm::setSettings(QVariantMap settings) {
 		int roiWidth = settings.value(SIGNALMONITOR_ROI_WIDTH).toInt();
 		int roiHeight = settings.value(SIGNALMONITOR_ROI_HEIGHT).toInt();
 		this->parameters.roi = QRect(roiX, roiY, roiWidth, roiHeight);
+		this->parameters.windowState = settings.value(SIGNALMONITOR_WINDOW_STATE).toByteArray();
 	}
 
 	//update gui elements
@@ -117,6 +120,7 @@ void SignalMonitorForm::setSettings(QVariantMap settings) {
 	this->ui->horizontalSlider_frame->setValue(this->parameters.frameNr);
 	this->ui->spinBox_nthBuffer->setValue(this->parameters.nthBufferToUse);
 	this->ui->widget_imageDisplay->setRoi(this->parameters.roi);
+	this->restoreGeometry(this->parameters.windowState);
 }
 
 void SignalMonitorForm::getSettings(QVariantMap* settings) {
@@ -133,7 +137,21 @@ void SignalMonitorForm::getSettings(QVariantMap* settings) {
 	settings->insert(SIGNALMONITOR_ROI_Y, this->parameters.roi.y());
 	settings->insert(SIGNALMONITOR_ROI_WIDTH, this->parameters.roi.width());
 	settings->insert(SIGNALMONITOR_ROI_HEIGHT, this->parameters.roi.height());
+	settings->insert(SIGNALMONITOR_WINDOW_STATE, this->parameters.windowState);
 }
+
+bool SignalMonitorForm::eventFilter(QObject* watched, QEvent* event) {
+	if (watched == this) {
+		if (event->type() == QEvent::Resize || event->type() == QEvent::Move) {
+			if (this->isVisible()) {
+				this->parameters.windowState = this->saveGeometry();
+				emit paramsChanged();
+			}
+		}
+	}
+	return QWidget::eventFilter(watched, event);
+}
+
 
 void SignalMonitorForm::toggleSettingsArea() {
 	QWidget* settingsArea = this->ui->widget_settings;
@@ -142,37 +160,36 @@ void SignalMonitorForm::toggleSettingsArea() {
 	const int minHeightWhenHidden = 220;
 	const int minHeightWhenShown = minHeightWhenHidden + 330;
 
-	// Prepare window height change animation
+	//prepare window height change animation
 	QPropertyAnimation* windowHeightAnimation = new QPropertyAnimation(this, "geometry");
-	windowHeightAnimation->setDuration(animationDuration); // Animation duration in milliseconds
+	windowHeightAnimation->setDuration(animationDuration); //animation duration in milliseconds
 	QRect startGeometry = this->geometry();
 
-
-	// Prepare the settings widget height animation
+	//prepare the settings widget height animation
 	QPropertyAnimation* settingsHeightAnimation = new QPropertyAnimation(settingsArea, "maximumHeight");
 	settingsHeightAnimation->setDuration(animationDuration); // Animation duration in milliseconds
 
 	bool isSettingsAreaVisible = settingsArea->isVisible();
 	if (isSettingsAreaVisible) {
 		//if the widget is visible, prepare to hide the settings widget
-		this->setMinimumHeight(minHeightWhenHidden); // Set minimum height before hiding
+		this->setMinimumHeight(minHeightWhenHidden);
 		settingsHeightAnimation->setStartValue(deltaHeight);
 		settingsHeightAnimation->setEndValue(0);
 		settingsArea->setMinimumHeight(0);
 		connect(settingsHeightAnimation, &QPropertyAnimation::finished, settingsArea, &QWidget::hide);
 		connect(settingsHeightAnimation, &QPropertyAnimation::finished, this, [this, minHeightWhenHidden, settingsArea, deltaHeight]() {
-			this->setMinimumHeight(minHeightWhenHidden); // Adjust the minimum height after hiding
+			this->setMinimumHeight(minHeightWhenHidden);
 			settingsArea->setMinimumHeight(deltaHeight);
 		});
 	} else {
 		//show the settings widget
 		settingsArea->show();
-		settingsArea->setMaximumHeight(0); // Start from a height of 0
+		settingsArea->setMaximumHeight(0);
 		settingsHeightAnimation->setStartValue(0);
 		settingsHeightAnimation->setEndValue(deltaHeight);
 		settingsArea->setMinimumHeight(0);
 		connect(settingsHeightAnimation, &QPropertyAnimation::finished, this, [this, minHeightWhenShown, settingsArea, deltaHeight]() {
-			this->setMinimumHeight(minHeightWhenShown); // Adjust the minimum height after showing
+			this->setMinimumHeight(minHeightWhenShown);
 			settingsArea->setMinimumHeight(deltaHeight);
 		});
 	}

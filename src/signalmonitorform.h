@@ -28,7 +28,7 @@ public:
 	Ui::SignalMonitorForm* ui;
 
 protected:
-
+	bool eventFilter(QObject* watched, QEvent* event) override;
 
 public slots:
 	void toggleSettingsArea();
